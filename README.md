@@ -19,7 +19,7 @@ This is a simple Flask-based web application that allows users to browse and vie
 With the current settings only videos in the project directory and subdirectories will be processed. The supported formats are '.mp4', '.avi', '.mov' and '.mkv'.
 
 ## Execute
-The run the app:
+To run the app:
 
 ```bash
 python3 app.py
