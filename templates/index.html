@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Gallery</title>
+    <title>local-video</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Video Gallery</h1>
     <div class="gallery">
         {% for video in videos %}
             {% set directory_name, file_name = video.rsplit('/', 1) %}

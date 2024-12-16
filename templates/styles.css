@@ -6,12 +6,6 @@ body {
     color: #ccc;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #fff;
-}
-
 .gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
