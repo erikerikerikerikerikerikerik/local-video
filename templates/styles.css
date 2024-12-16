@@ -82,11 +82,11 @@ h1 {
 }
 
 .overlay .directory-name {
-    font-size: 10px; /* Larger font size for directory name */
+    font-size: 10px; 
 }
 
 .overlay .file-name {
-    font-size: 8px; /* Smaller font size for filename */
+    font-size: 8px; 
 }
 
 .floating-buttons {
