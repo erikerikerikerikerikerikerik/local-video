@@ -1,7 +1,6 @@
 import os
 import ffmpeg
 from flask import Flask, render_template, send_from_directory
-import tempfile
 
 app = Flask(__name__, static_folder='templates')
 
