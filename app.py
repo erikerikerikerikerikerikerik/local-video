@@ -22,6 +22,7 @@ def find_videos(root_dir, excluded_dir):
 @app.route('/')
 def index():
     videos = find_videos(PROJECT_ROOT, EXCLUDED_DIR)
+    print(f"Found videos: {videos}") 
     return render_template('index.html', videos=videos)
 
 @app.route('/play/<path:filename>')
