@@ -101,7 +101,6 @@ def serve_video(filename):
 
     response.headers['Accept-Ranges'] = 'bytes'
     return response
-    #return send_from_directory(PROJECT_ROOT, filename)
 
 @app.route('/thumbnail/<path:filename>')
 def serve_thumbnail(filename):
