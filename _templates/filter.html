@@ -11,12 +11,13 @@
         {% for directory, videos in directory_tree.items() %}
             <div class="directory">
                 <h2 class="path-main">
-                    {% set path_parts = directory.split(path_sep) %}
-                    {% if path_parts|length > 1 %}
+                    {% set path_parts = directory.split('/') %}
+                    {% if path_parts|length > 2 %}
+                        <span class="dir">{{ path_parts[0] }} / {{ path_parts[1] }}</span>
+                        <span class="subdir">{{ path_parts[2:]|join('/') }}</span>
+                    {% else %}
                         <span class="dir">{{ path_parts[0] }}</span>
                         <span class="subdir">{{ path_parts[1:]|join('/') }}</span>
-                    {% else %}
-                        <span class="subdir">{{ directory }}</span>
                     {% endif %}
                 </h2>
                 <div class="gallery gallery-5">
@@ -44,12 +45,11 @@
 
     <script>
         function setGridColumns(columns) {
-            const galleries = document.querySelectorAll('.gallery');
-            galleries.forEach(gallery => {
-                gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
-                gallery.classList.add(`gallery-${columns}`);
-            });
+            const gallery = document.querySelector('.gallery');
+            gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+            gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
+            gallery.classList.add(`gallery-${columns}`);
         }
     </script>
 </body>
