@@ -8,6 +8,7 @@ The `local-video` app is a simple Flask-based web application designed to manage
 
 - Automatically indexes videos and generates thumbnails.
 - Displays a gallery of videos with thumbnails.
+- Switch to directory tree gallery view.
 - Plays video files with a built-in video player.
 - Supports common video formats (`.mp4`, `.avi`, `.mov`, `.mkv`).
 - Customizable thumbnail and template directories.
