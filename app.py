@@ -28,8 +28,12 @@ def generate_video_thumbnail(video_path):
         return thumbnail_filename
 
     try:
-        ffmpeg.input(video_path, ss=10).output(
-            thumbnail_path, vframes=1, vf="scale='min(iw,300)':'min(ih,300)'", strict='unofficial'
+        ffmpeg.input(video_path, ss=12).output(
+            thumbnail_path, vframes=1, vf=(
+                "scale="
+                "'if(gt(iw,ih),300,-1)':"
+                "'if(lt(iw,ih),300,-1)'"
+            ), strict='unofficial'
         ).run(capture_stdout=True, capture_stderr=True)
     except ffmpeg.Error as e:
         print(f"Error generating thumbnail for {video_filename}: {e.stderr.decode('utf-8')}")
