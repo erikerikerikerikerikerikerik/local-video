@@ -47,3 +47,6 @@ The app will index all videos located in the project directory and/or subdirecto
 
 The main page will display a gallery of videos. Thumbnails are automatically
 generated for each supported video file. You can click on a thumbnail to play the corresponding video.
+Video player supports timeskip with arrow keys!
+
+- Erik
