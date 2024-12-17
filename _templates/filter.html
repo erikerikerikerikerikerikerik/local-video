@@ -45,11 +45,13 @@
 
     <script>
         function setGridColumns(columns) {
-            const gallery = document.querySelector('.gallery');
-            gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            const galleries = document.querySelectorAll('.gallery');
+            galleries.forEach((gallery) => {
+                gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
-            gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
-            gallery.classList.add(`gallery-${columns}`);
+                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
+                gallery.classList.add(`gallery-${columns}`);
+            });
         }
     </script>
 </body>
