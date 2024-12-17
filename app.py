@@ -6,6 +6,7 @@ local-video app
 import os
 import ffmpeg
 from flask import Flask, render_template, send_from_directory
+from flask import Response, request
 
 app = Flask(__name__, static_folder='templates')
 
@@ -50,6 +51,14 @@ def find_videos(root_dir, excluded_dirs):
                 video_files.append(relative_path)
     return video_files
 
+def get_video_stream(video_path):
+    """stream video"""
+    def generate():
+        with open(video_path, 'rb') as f:
+            while chunk := f.read(4096):
+                yield chunk
+    return generate
+
 @app.route('/')
 def index():
     """index /"""
@@ -70,7 +79,29 @@ def play_video(filename):
 @app.route('/video/<path:filename>')
 def serve_video(filename):
     """serve video"""
-    return send_from_directory(PROJECT_ROOT, filename)
+    video_path = os.path.join(PROJECT_ROOT, filename)
+    range_header = request.headers.get('Range', None)
+    if not os.path.exists(video_path):
+        return "File not found", 404
+
+    if range_header:
+        start, end = range_header.replace('bytes=', '').split('-')
+        start = int(start)
+        end = int(end) if end else os.path.getsize(video_path) - 1
+        chunk_size = end - start + 1
+
+        with open(video_path, 'rb') as f:
+            f.seek(start)
+            data = f.read(chunk_size)
+
+        response = Response(data, status=206, mimetype='video/mp4')
+        response.headers['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(video_path)}'
+    else:
+        response = Response(get_video_stream(video_path), mimetype='video/mp4')
+
+    response.headers['Accept-Ranges'] = 'bytes'
+    return response
+    #return send_from_directory(PROJECT_ROOT, filename)
 
 @app.route('/thumbnail/<path:filename>')
 def serve_thumbnail(filename):
