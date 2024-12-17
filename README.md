@@ -20,11 +20,13 @@ The `local-video` app is a simple Flask-based web application designed to manage
 
 ## Structure
 
+```bash
 local-video/
 │
 ├── _templates/            # Contains HTML templates and static files (CSS, JS, etc.)
 ├── _thumbnails/           # Contains generated video thumbnails
 └── app.py                 # Main Flask app
+```
 
 The app will index all videos located in the project directory and/or subdirectories (`_templates` and `_thumbnails` directories excluded from index).
 
