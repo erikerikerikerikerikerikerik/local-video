@@ -6,4 +6,5 @@ __pycache__/
 .Trashes
 video
 thumbnails
+_thumbnails
 venv

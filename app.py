@@ -8,11 +8,11 @@ import ffmpeg
 from flask import Flask, render_template, send_from_directory
 from flask import Response, request
 
-app = Flask(__name__, static_folder='templates')
+app = Flask(__name__, static_folder='_templates', template_folder='_templates')
 
 PROJECT_ROOT = os.path.abspath('.')
-EXCLUDED_DIRS = ['templates', 'thumbnails']
-THUMBNAILS_DIR = os.path.join(PROJECT_ROOT, 'thumbnails')
+EXCLUDED_DIRS = ['_templates', '_thumbnails']
+THUMBNAILS_DIR = os.path.join(PROJECT_ROOT, '_thumbnails')
 SUPPORTED_EXTENSIONS = ('.mp4', '.avi', '.mov', '.mkv')
 
 if not os.path.exists(THUMBNAILS_DIR):
@@ -105,7 +105,7 @@ def serve_video(filename):
     response.headers['Accept-Ranges'] = 'bytes'
     return response
 
-@app.route('/thumbnail/<path:filename>')
+@app.route('/_thumbnails/<path:filename>')
 def serve_thumbnail(filename):
     """serve thumbnail"""
     return send_from_directory(THUMBNAILS_DIR, filename)
