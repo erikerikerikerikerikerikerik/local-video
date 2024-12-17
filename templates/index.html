@@ -9,16 +9,18 @@
 <body>
     <div class="gallery">
         {% for video in videos %}
-            {% set directory_name, file_name = video.rsplit('/', 1) %}
-            <div class="gallery-item">
-                <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                    <img src="{{ url_for('serve_thumbnail', filename=thumbnails[video]) }}" alt="Video Thumbnail">
-                    <div class="overlay">
-                        <div class="directory-name">{{ directory_name }}</div>
-                        <div class="file-name">{{ file_name }}</div>
-                    </div>
-                </a>
-            </div>
+            {% if thumbnails[video] %}
+                {% set directory_name, file_name = video.rsplit('/', 1) %}
+                <div class="gallery-item">
+                    <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
+                        <img src="{{ url_for('serve_thumbnail', filename=thumbnails[video]) }}" alt="Video Thumbnail">
+                        <div class="overlay">
+                            <div class="directory-name">{{ directory_name }}</div>
+                            <div class="file-name">{{ file_name }}</div>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 
