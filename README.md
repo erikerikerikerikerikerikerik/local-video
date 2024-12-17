@@ -1,15 +1,16 @@
 # local-video
 
-This is a simple Flask-based web application that allows users to browse and view videos from a specified directory structure.
+The `local-video` app is a simple Flask-based web application designed to manage and display video files on your local machine. It allows users to view video files, generate thumbnails, and stream videos directly from a local server.
 
 ###### Designed and coded by erikerikerikerikerikerikerik
 
 ## Features
 
-- **Thumbnail Generation**: Automatically generates video thumbnails from videos located in subdirectories.
-- **Gallery View**: Displays video thumbnails in a grid layout, with options to change the number of items per row.
-- **Video Playback**: Clicking on a video thumbnail opens the video in a new window.
-- **Dark Mode UI**: The app has a dark, modern look with hover effects and a floating control panel for layout changes.
+- Automatically indexes videos and generates thumbnails.
+- Displays a gallery of videos with thumbnails.
+- Plays video files with a built-in video player.
+- Supports common video formats (`.mp4`, `.avi`, `.mov`, `.mkv`).
+- Customizable thumbnail and template directories.
 
 ## Requirements
 
@@ -17,16 +18,29 @@ This is a simple Flask-based web application that allows users to browse and vie
 - Flask
 - FFmpeg
 
-## Settings
+## Structure
 
-With the current settings only videos in the project directory and subdirectories will be processed. The supported formats are '.mp4', '.avi', '.mov' and '.mkv'.
+local-video/
+│
+├── _templates/            # Contains HTML templates and static files (CSS, JS, etc.)
+├── _thumbnails/           # Contains generated video thumbnails
+└── app.py                 # Main Flask app
 
-## Execute
+The app will index all videos located in the project directory and/or subdirectories (`_templates` and `_thumbnails` directories excluded from index).
 
-To run the app:
+## Usage
 
-```bash
-python3 app.py
-```
+1. Run the Flask server:
 
-It will spawn a webserver under localhost or 127.0.0.1 (depending on your system settings) on port 5000.
+    ```bash
+    python3 app.py
+    ```
+
+2. Open your browser and navigate to:
+
+    ```bash
+    http://127.0.0.1:5000/
+    ```
+
+The main page will display a gallery of videos. Thumbnails are automatically
+generated for each supported video file. You can click on a thumbnail to play the corresponding video.
