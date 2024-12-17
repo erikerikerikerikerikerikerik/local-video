@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory View</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='filter.css') }}">
+</head>
+<body>
+    <div class="directory-tree">
+        {% for directory, videos in directory_tree.items() %}
+            <div class="directory">
+                <h2 class="path-main">
+                    {% set path_parts = directory.split(path_sep) %}
+                    {% if path_parts|length > 1 %}
+                        <span class="dir">{{ path_parts[0] }}</span>
+                        <span class="subdir">{{ path_parts[1:]|join('/') }}</span>
+                    {% else %}
+                        <span class="subdir">{{ directory }}</span>
+                    {% endif %}
+                </h2>
+                <div class="gallery gallery-5">
+                    {% for video in videos %}
+                        <div class="gallery-item">
+                            <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
+                                <img src="{{ url_for('serve_thumbnail', filename=thumbnails[video.split('/')[-1]]) }}" alt="Video Thumbnail">
+                                <div class="overlay">
+                                    <div class="file-name">{{ video.split('/')[-1] }}</div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="floating-buttons">
+        <button onclick="setGridColumns(3)">III</button>
+        <button onclick="setGridColumns(5)">V</button>
+        <button onclick="setGridColumns(10)">X</button>
+        <a href="{{ url_for('index') }}"><button>-</button></a>
+    </div>
+
+    <script>
+        function setGridColumns(columns) {
+            const galleries = document.querySelectorAll('.gallery');
+            galleries.forEach(gallery => {
+                gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
+                gallery.classList.add(`gallery-${columns}`);
+            });
+        }
+    </script>
+</body>
+</html>

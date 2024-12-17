@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="gallery">
+    <div class="gallery gallery-5">
         {% for video in videos %}
             {% if thumbnails[video] %}
                 {% set directory_name, file_name = video.rsplit('/', 1) %}
@@ -28,6 +28,9 @@
         <button onclick="setGridColumns(3)">III</button>
         <button onclick="setGridColumns(5)">V</button>
         <button onclick="setGridColumns(10)">X</button>
+        <a href="{{ url_for('directory', subdir='') }}">
+            <button>+</button>
+        </a>
     </div>
 
     <script>
