@@ -67,6 +67,14 @@ body {
     visibility: hidden;
 }
 
+.gallery-20 {
+    grid-template-columns: repeat(20, 1fr);
+}
+
+.gallery-20 .gallery-item .overlay {
+    visibility: hidden;
+}
+
 .gallery-item {
     position: relative;
     text-align: center;
@@ -94,6 +102,7 @@ body {
 .gallery-3 .gallery-item { height: 300px; }
 .gallery-5 .gallery-item { height: 200px; }
 .gallery-10 .gallery-item { height: 100px; }
+.gallery-20 .gallery-item { height: 80px; }
 
 .gallery-item .overlay {
     position: absolute;

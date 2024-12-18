@@ -40,7 +40,8 @@
         <button onclick="setGridColumns(3)">III</button>
         <button onclick="setGridColumns(5)">V</button>
         <button onclick="setGridColumns(10)">X</button>
-        <a href="{{ url_for('index') }}"><button>-</button></a>
+        <button onclick="setGridColumns(20)">!</button>
+        <a href="{{ url_for('index') }}"><button>?</button></a>
     </div>
 
     <script>
@@ -49,7 +50,7 @@
             galleries.forEach((gallery) => {
                 gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
-                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10');
+                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10', 'gallery-20');
                 gallery.classList.add(`gallery-${columns}`);
             });
         }

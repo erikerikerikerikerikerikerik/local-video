@@ -24,6 +24,12 @@
                     video.currentTime += 10;
                 } else if (event.key === 'ArrowLeft') {
                     video.currentTime -= 10;
+                } else if (event.key === ' ') {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
                 }
             });
         });
