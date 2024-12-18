@@ -4,6 +4,8 @@ local-video app
 """
 
 import os
+import webbrowser
+from threading import Timer
 import ffmpeg
 from flask import Flask, render_template, send_from_directory
 from flask import Response, request
@@ -160,4 +162,5 @@ def directory(subdir):
     )
 
 if __name__ == '__main__':
+    Timer(1, lambda: webbrowser.open_new('http://127.0.0.1:5000')).start()
     app.run(debug=True)
