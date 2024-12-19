@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="gallery gallery-5">
+    <div class="gallery gallery-10">
         {% for video in videos %}
             {% if thumbnails[video] %}
                 {% set directory_name, file_name = video.rsplit('/', 1) %}
