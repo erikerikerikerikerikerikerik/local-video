@@ -45,7 +45,7 @@ body {
 .gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    gap: 5px;
     max-width: 100%;
     padding: 0 20px;
     box-sizing: border-box;
@@ -91,8 +91,6 @@ body {
     object-fit: cover;
     object-position: center;
     cursor: pointer;
-    border-radius: 5px;
-    border: 2px solid #555;
 }
 
 .gallery-item img:hover {
