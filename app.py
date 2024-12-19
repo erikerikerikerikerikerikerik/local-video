@@ -112,22 +112,6 @@ def serve_thumbnail(filename):
     """serve thumbnail"""
     return send_from_directory(THUMBNAILS_DIR, filename)
 
-def build_directory_tree(root_dir):
-    """Build a directory tree"""
-    directory_tree = {}
-    for root, _, files in os.walk(root_dir):
-        if any(excluded_dir in root for excluded_dir in EXCLUDED_DIRS):
-            continue
-        relative_dir = os.path.relpath(root, root_dir)
-        video_files = [
-            os.path.join(relative_dir, f)
-            for f in files
-            if f.lower().endswith(SUPPORTED_EXTENSIONS)
-        ]
-        if video_files:
-            directory_tree[relative_dir] = video_files
-    return directory_tree
-
 @app.route('/directory/', defaults={'subdir': ''})
 @app.route('/directory/<path:subdir>')
 def directory(subdir):
