@@ -55,8 +55,6 @@ body {
     object-fit: cover;
     object-position: center;
     cursor: pointer;
-    border-radius: 5px;
-    border: 2px solid #555;
 }
 
 .gallery-item img:hover {
