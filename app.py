@@ -29,7 +29,7 @@ def generate_video_thumbnail(video_path):
 
     first_thumbnail = os.path.join(THUMBNAILS_DIR, f"{base_filename}_00.jpg")
 
-    stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+    stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 40]
     generated_thumbnails = [f"{base_filename}_{i:02d}.jpg" for i in range(len(stillframes))]
 
     if os.path.exists(first_thumbnail):
