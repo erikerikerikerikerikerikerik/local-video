@@ -58,7 +58,7 @@ body {
 }
 
 .gallery-item img:hover {
-    transform: scale(1.1);
+    transform: scale(1.04);
 }
 
 .gallery-3 .gallery-item { height: 300px; }
@@ -128,4 +128,16 @@ a {
 
 a:hover {
     opacity: 0.8;
+}
+
+.thumbnail {
+    transition: all 0.3s ease-in-out;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+}
+
+.thumbnail:hover {
+    opacity: 1;
 }

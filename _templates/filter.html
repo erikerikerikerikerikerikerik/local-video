@@ -24,7 +24,10 @@
                     {% for video in videos %}
                         <div class="gallery-item">
                             <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                                <img src="{{ url_for('serve_thumbnail', filename=thumbnails[video.split('/')[-1]]) }}" alt="Video Thumbnail">
+                                <img class="thumbnail" 
+                                    src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
+                                    alt="Video Thumbnail" 
+                                    data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
                                 <div class="overlay">
                                     <div class="file-name">{{ video.split('/')[-1] }}</div>
                                 </div>
@@ -47,13 +50,31 @@
     <script>
         function setGridColumns(columns) {
             const galleries = document.querySelectorAll('.gallery');
-            galleries.forEach((gallery) => {
+            galleries.forEach(gallery => {
                 gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
                 gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10', 'gallery-20');
                 gallery.classList.add(`gallery-${columns}`);
             });
         }
+
+        document.querySelectorAll('.thumbnail').forEach(thumbnail => {
+            const thumbnailsList = thumbnail.dataset.thumbnails.split(',');
+            let currentIndex = 0;
+            let interval;
+
+            thumbnail.addEventListener('mouseover', () => {
+                interval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % thumbnailsList.length;
+                    thumbnail.src = `/_thumbnails/${thumbnailsList[currentIndex].trim()}`;
+                }, 500);
+            });
+
+            thumbnail.addEventListener('mouseout', () => {
+                clearInterval(interval);
+                thumbnail.src = `/_thumbnails/${thumbnailsList[0].trim()}`;
+            });
+        });
     </script>
 </body>
 </html>

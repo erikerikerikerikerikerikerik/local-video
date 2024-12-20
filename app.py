@@ -21,27 +21,60 @@ if not os.path.exists(THUMBNAILS_DIR):
     os.makedirs(THUMBNAILS_DIR)
 
 def generate_video_thumbnail(video_path):
-    """generate video thumbnail"""
+    """generate multiple thumbnails"""
     video_filename = os.path.basename(video_path)
-    thumbnail_filename = os.path.splitext(video_filename)[0] + '.jpg'
-    thumbnail_path = os.path.join(THUMBNAILS_DIR, thumbnail_filename)
+    base_filename = os.path.splitext(video_filename)[0]
 
-    if os.path.exists(thumbnail_path):
-        return thumbnail_filename
+    os.makedirs(THUMBNAILS_DIR, exist_ok=True)
 
+    first_thumbnail = os.path.join(THUMBNAILS_DIR, f"{base_filename}_00.jpg")
+
+    stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 40]
+    generated_thumbnails = [f"{base_filename}_{i:02d}.jpg" for i in range(len(stillframes))]
+
+    if os.path.exists(first_thumbnail):
+        print(f"First thumbnail found for {video_path}. Skipping further generation.")
+        return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
+
+    thumb_number = 0
+    video_duration = get_video_duration(video_path)
+
+    for time in stillframes:
+        if time > video_duration:
+            print(f"skipping {time} of {base_filename}")
+            continue
+
+        thumbnail_filename = f"{base_filename}_{thumb_number:02d}.jpg"
+        thumbnail_path = os.path.join(THUMBNAILS_DIR, thumbnail_filename)
+
+        if os.path.exists(thumbnail_path):
+            print(f"Thumbnail already exists: {thumbnail_filename}")
+            generated_thumbnails.append(thumbnail_filename)
+        else:
+            ffmpeg.input(video_path, ss=time).output(
+                thumbnail_path, vframes=1, vf=(
+                    "scale="
+                    "'if(gt(iw,ih),300,-1)':"
+                    "'if(lt(iw,ih),300,-1)'"
+                ), strict='unofficial'
+            ).run(capture_stdout=True, capture_stderr=True)
+
+            print(f"Thumbnail generated: {thumbnail_path}")
+            generated_thumbnails.append(thumbnail_filename)
+
+        thumb_number += 1
+
+    return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
+
+def get_video_duration(video_path):
+    """duration of vid in seconds"""
     try:
-        ffmpeg.input(video_path, ss=12).output(
-            thumbnail_path, vframes=1, vf=(
-                "scale="
-                "'if(gt(iw,ih),300,-1)':"
-                "'if(lt(iw,ih),300,-1)'"
-            ), strict='unofficial'
-        ).run(capture_stdout=True, capture_stderr=True)
+        probe = ffmpeg.probe(video_path, v='error', select_streams='v:0', show_entries='format=duration')
+        duration = float(probe['format']['duration'])
+        return duration
     except ffmpeg.Error as e:
-        print(f"Error generating thumbnail for {video_filename}: {e.stderr.decode('utf-8')}")
-        return None
-
-    return thumbnail_filename
+        print(f"Error getting video duration: {e}")
+        return 0
 
 def find_videos(root_dir, excluded_dirs):
     """find videos"""
@@ -72,9 +105,10 @@ def index():
 
     for video in videos:
         video_path = os.path.join(PROJECT_ROOT, video)
-        video_thumbnails[video] = generate_video_thumbnail(video_path)
+        thumbnails = generate_video_thumbnail(video_path)
+        video_thumbnails[video] = thumbnails
 
-    return render_template('index.html', videos=videos, thumbnails=video_thumbnails)
+    return render_template('index.html', videos=videos, video_thumbnails=video_thumbnails)
 
 @app.route('/play/<path:filename>')
 def play_video(filename):
@@ -122,29 +156,33 @@ def directory(subdir):
         dir_path = PROJECT_ROOT
 
     directory_tree = {}
-    thumbnails = {}
+    video_thumbnails = {}
 
     for root, _, files in os.walk(dir_path):
         relative_dir = os.path.relpath(root, PROJECT_ROOT)
         video_files = []
+
         for file in files:
             if file.lower().endswith(SUPPORTED_EXTENSIONS):
                 video_files.append(os.path.join(relative_dir, file))
-                video_path = os.path.join(PROJECT_ROOT, file)
-                thumbnail_filename = generate_video_thumbnail(video_path)
-                if thumbnail_filename:
-                    thumbnails[file] = thumbnail_filename
 
         if video_files:
             directory_tree[relative_dir] = video_files
 
+        for video in video_files:
+            video_path = os.path.join(PROJECT_ROOT, video)
+            thumbnails = generate_video_thumbnail(video_path)
+
+            if thumbnails:
+                video_thumbnails[video] = thumbnails
+
     return render_template(
         'filter.html', 
         directory_tree=directory_tree,
-        thumbnails=thumbnails,
+        video_thumbnails=video_thumbnails,
         path_sep=os.path.sep
     )
 
 if __name__ == '__main__':
     Timer(1, lambda: webbrowser.open_new('http://127.0.0.1:5000')).start()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
