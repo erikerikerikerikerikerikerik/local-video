@@ -27,10 +27,16 @@ def generate_video_thumbnail(video_path):
 
     os.makedirs(THUMBNAILS_DIR, exist_ok=True)
 
-    stillframes = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-    generated_thumbnails = []
-    thumb_number = 0
+    first_thumbnail = os.path.join(THUMBNAILS_DIR, f"{base_filename}_00.jpg")
 
+    stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+    generated_thumbnails = [f"{base_filename}_{i:02d}.jpg" for i in range(len(stillframes))]
+
+    if os.path.exists(first_thumbnail):
+        print(f"First thumbnail found for {video_path}. Skipping further generation.")
+        return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
+
+    thumb_number = 0
     video_duration = get_video_duration(video_path)
 
     for time in stillframes:
@@ -58,7 +64,7 @@ def generate_video_thumbnail(video_path):
 
         thumb_number += 1
 
-    return generated_thumbnails
+    return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
 
 def get_video_duration(video_path):
     """duration of vid in seconds"""

@@ -24,15 +24,10 @@
                     {% for video in videos %}
                         <div class="gallery-item">
                             <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                                {% if video in video_thumbnails and video_thumbnails[video] %}
-                                    <img class="thumbnail" 
-                                         src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
-                                         alt="Video Thumbnail" 
-                                         data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
-                                {% else %}
-                                    <img class="thumbnail" src="{{ url_for('serve_thumbnail', filename=default-thumbnail.jpg) }}" alt="No Thumbnail">
-                                {% endif %}
-                                
+                                <img class="thumbnail" 
+                                    src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
+                                    alt="Video Thumbnail" 
+                                    data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
                                 <div class="overlay">
                                     <div class="file-name">{{ video.split('/')[-1] }}</div>
                                 </div>
