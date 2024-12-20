@@ -6,6 +6,7 @@ The `local-video` app is a simple Flask-based web application designed to manage
 
 ## Features
 
+- NEW: thumbnails display a slideshow on mouse hover.
 - Automatically indexes videos and generates thumbnails.
 - Displays a gallery of videos with thumbnails.
 - Switch to directory tree gallery view.
