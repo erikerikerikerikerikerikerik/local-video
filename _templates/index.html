@@ -9,11 +9,18 @@
 <body>
     <div class="gallery gallery-10">
         {% for video in videos %}
-            {% if thumbnails[video] %}
+            {% if video_thumbnails[video] %}
                 {% set directory_name, file_name = video.rsplit('/', 1) %}
                 <div class="gallery-item">
                     <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                        <img src="{{ url_for('serve_thumbnail', filename=thumbnails[video]) }}" alt="Video Thumbnail">
+                        {% if video in video_thumbnails and video_thumbnails[video] %}
+                            <img class="thumbnail" 
+                                src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
+                                alt="Video Thumbnail"
+                                data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
+                        {% else %}
+                            <img class="thumbnail" src="{{ url_for('serve_thumbnail', filename=default-thumbnail.jpg) }}" alt="No Thumbnail">
+                        {% endif %}
                         <div class="overlay">
                             <div class="directory-name">{{ directory_name }}</div>
                             <div class="file-name">{{ file_name }}</div>
@@ -23,6 +30,7 @@
             {% endif %}
         {% endfor %}
     </div>
+    
 
     <div class="floating-buttons">
         <button onclick="setGridColumns(3)">III</button>
@@ -42,6 +50,24 @@
             gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10', 'gallery-20');
             gallery.classList.add(`gallery-${columns}`);
         }
+
+        document.querySelectorAll('.thumbnail').forEach(thumbnail => {
+            const thumbnailsList = thumbnail.dataset.thumbnails.split(',');
+            let currentIndex = 0;
+            let interval;
+
+            thumbnail.addEventListener('mouseover', () => {
+                interval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % thumbnailsList.length;
+                    thumbnail.src = `/_thumbnails/${thumbnailsList[currentIndex].trim()}`;
+                }, 500);
+            });
+
+            thumbnail.addEventListener('mouseout', () => {
+                clearInterval(interval);
+                thumbnail.src = `/_thumbnails/${thumbnailsList[0].trim()}`;
+            });
+        });
     </script>
 </body>
 </html>
