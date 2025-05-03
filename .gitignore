@@ -7,4 +7,5 @@ __pycache__/
 video
 thumbnails
 _thumbnails
+_*.command
 venv
