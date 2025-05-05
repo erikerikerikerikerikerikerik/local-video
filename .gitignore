@@ -8,4 +8,6 @@ video
 thumbnails
 _thumbnails
 _*.command
+favorites.json
+app-old.py
 venv

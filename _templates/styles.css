@@ -141,3 +141,28 @@ a:hover {
 .thumbnail:hover {
     opacity: 1;
 }
+
+.favorite-star {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-size: 18px;
+    color: #888;
+    z-index: 10;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+}
+
+.favorite-star.favorited {
+    color: gold;
+}
+
+.gallery-item.dimmed {
+    filter: grayscale(100%) brightness(0.6);
+}
+
+.floating-buttons.left {
+    left: 20px;
+    right: auto;
+}

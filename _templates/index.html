@@ -13,14 +13,11 @@
                 {% set directory_name, file_name = video.rsplit('/', 1) %}
                 <div class="gallery-item">
                     <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                        {% if video in video_thumbnails and video_thumbnails[video] %}
-                            <img class="thumbnail" 
-                                src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
-                                alt="Video Thumbnail"
-                                data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
-                        {% else %}
-                            <img class="thumbnail" src="{{ url_for('serve_thumbnail', filename=default-thumbnail.jpg) }}" alt="No Thumbnail">
-                        {% endif %}
+                        <div class="favorite-star" onclick="toggleFavorite(event, '{{ video }}')">★</div>
+                        <img class="thumbnail" 
+                             src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
+                             alt="Video Thumbnail"
+                             data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
                         <div class="overlay">
                             <div class="directory-name">{{ directory_name }}</div>
                             <div class="file-name">{{ file_name }}</div>
@@ -30,7 +27,6 @@
             {% endif %}
         {% endfor %}
     </div>
-    
 
     <div class="floating-buttons">
         <button onclick="setGridColumns(3)">III</button>
@@ -41,31 +37,85 @@
             <button>?</button>
         </a>
     </div>
+    <div class="floating-buttons left">
+        <button onclick="toggleFavoriteView()">★</button>
+    </div>
 
     <script>
+        let favoriteViewActive = false;
+    
+        async function loadFavorites() {
+            const res = await fetch('/api/favorites');
+            const favorites = await res.json();
+    
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                const star = item.querySelector('.favorite-star');
+                const videoPath = star?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                if (favorites[videoPath]) {
+                    star.classList.add('favorited');
+                }
+            });
+        }
+    
+        async function toggleFavorite(event, video) {
+            event.preventDefault();
+            event.stopPropagation();
+            const star = event.target;
+            const isFavorited = star.classList.toggle('favorited');
+    
+            await fetch('/api/favorite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: video, favorite: !!isFavorited })
+            });
+        }
+    
+        async function toggleFavoriteView() {
+            favoriteViewActive = !favoriteViewActive;
+            const res = await fetch('/api/favorites');
+            const favorites = await res.json();
+    
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                const star = item.querySelector('.favorite-star');
+                const videoPath = star?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    
+                if (favoriteViewActive) {
+                    if (!favorites[videoPath]) {
+                        item.classList.add('dimmed');
+                    }
+                } else {
+                    item.classList.remove('dimmed');
+                }
+            });
+        }
+    
         function setGridColumns(columns) {
             const gallery = document.querySelector('.gallery');
             gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
+    
             gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10', 'gallery-20');
             gallery.classList.add(`gallery-${columns}`);
         }
-
-        document.querySelectorAll('.thumbnail').forEach(thumbnail => {
-            const thumbnailsList = thumbnail.dataset.thumbnails.split(',');
-            let currentIndex = 0;
-            let interval;
-
-            thumbnail.addEventListener('mouseover', () => {
-                interval = setInterval(() => {
-                    currentIndex = (currentIndex + 1) % thumbnailsList.length;
-                    thumbnail.src = `/_thumbnails/${thumbnailsList[currentIndex].trim()}`;
-                }, 500);
-            });
-
-            thumbnail.addEventListener('mouseout', () => {
-                clearInterval(interval);
-                thumbnail.src = `/_thumbnails/${thumbnailsList[0].trim()}`;
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFavorites();
+    
+            document.querySelectorAll('.thumbnail').forEach(thumbnail => {
+                const thumbnailsList = thumbnail.dataset.thumbnails.split(',');
+                let currentIndex = 0;
+                let interval;
+    
+                thumbnail.addEventListener('mouseover', () => {
+                    interval = setInterval(() => {
+                        currentIndex = (currentIndex + 1) % thumbnailsList.length;
+                        thumbnail.src = `/_thumbnails/${thumbnailsList[currentIndex].trim()}`;
+                    }, 500);
+                });
+    
+                thumbnail.addEventListener('mouseout', () => {
+                    clearInterval(interval);
+                    thumbnail.src = `/_thumbnails/${thumbnailsList[0].trim()}`;
+                });
             });
         });
     </script>

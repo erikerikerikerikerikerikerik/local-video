@@ -6,65 +6,59 @@ local-video app
 import os
 import webbrowser
 from threading import Timer
+import json
 import ffmpeg
 from flask import Flask, render_template, send_from_directory
-from flask import Response, request
+from flask import Response, request, jsonify
 
 app = Flask(__name__, static_folder='_templates', template_folder='_templates')
 
 PROJECT_ROOT = os.path.abspath('.')
 EXCLUDED_DIRS = ['_templates', '_thumbnails']
 THUMBNAILS_DIR = os.path.join(PROJECT_ROOT, '_thumbnails')
+FAVORITES_FILE = os.path.join(PROJECT_ROOT, 'favorites.json')
 SUPPORTED_EXTENSIONS = ('.mp4', '.avi', '.mov', '.mkv')
 
 if not os.path.exists(THUMBNAILS_DIR):
     os.makedirs(THUMBNAILS_DIR)
 
+if not os.path.exists(FAVORITES_FILE):
+    with open(FAVORITES_FILE, 'w', encoding='utf-8') as f:
+        json.dump({}, f)
+
 def generate_video_thumbnail(video_path):
-    """generate multiple thumbnails"""
-    video_filename = os.path.basename(video_path)
-    base_filename = os.path.splitext(video_filename)[0]
-
-    os.makedirs(THUMBNAILS_DIR, exist_ok=True)
-
-    first_thumbnail = os.path.join(THUMBNAILS_DIR, f"{base_filename}_00.jpg")
+    """generate multiple thumbnails per video into a subfolder"""
+    relative_video_path = os.path.relpath(video_path, PROJECT_ROOT)
+    base_name = os.path.splitext(relative_video_path)[0]  # removes .mp4 etc
+    thumbnail_dir = os.path.join(THUMBNAILS_DIR, base_name)
+    os.makedirs(thumbnail_dir, exist_ok=True)
 
     stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 40]
-    generated_thumbnails = [f"{base_filename}_{i:02d}.jpg" for i in range(len(stillframes))]
+    generated_thumbnails = []
 
-    if os.path.exists(first_thumbnail):
-        print(f"First thumbnail found for {video_path}. Skipping further generation.")
-        return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
-
-    thumb_number = 0
     video_duration = get_video_duration(video_path)
 
-    for time in stillframes:
+    for idx, time in enumerate(stillframes):
         if time > video_duration:
-            print(f"skipping {time} of {base_filename}")
             continue
 
-        thumbnail_filename = f"{base_filename}_{thumb_number:02d}.jpg"
-        thumbnail_path = os.path.join(THUMBNAILS_DIR, thumbnail_filename)
+        thumbnail_filename = f"thumb_{idx:02d}.jpg"
+        thumbnail_path = os.path.join(thumbnail_dir, thumbnail_filename)
 
-        if os.path.exists(thumbnail_path):
-            print(f"Thumbnail already exists: {thumbnail_filename}")
-            generated_thumbnails.append(thumbnail_filename)
-        else:
-            ffmpeg.input(video_path, ss=time).output(
-                thumbnail_path, vframes=1, vf=(
-                    "scale="
-                    "'if(gt(iw,ih),300,-1)':"
-                    "'if(lt(iw,ih),300,-1)'"
-                ), strict='unofficial'
-            ).run(capture_stdout=True, capture_stderr=True)
+        if not os.path.exists(thumbnail_path):
+            try:
+                ffmpeg.input(video_path, ss=time).output(
+                    thumbnail_path, vframes=1, vf=(
+                        "scale='if(gt(iw,ih),300,-1)':'if(lt(iw,ih),300,-1)'"
+                    ), strict='unofficial'
+                ).run(capture_stdout=True, capture_stderr=True)
+            except ffmpeg.Error as e:
+                print(f"Error generating thumbnail: {e}")
+                continue
 
-            print(f"Thumbnail generated: {thumbnail_path}")
-            generated_thumbnails.append(thumbnail_filename)
+        generated_thumbnails.append(os.path.join(base_name, thumbnail_filename))
 
-        thumb_number += 1
-
-    return [thumb for thumb in generated_thumbnails if os.path.exists(os.path.join(THUMBNAILS_DIR, thumb))]
+    return generated_thumbnails
 
 def get_video_duration(video_path):
     """duration of vid in seconds"""
@@ -182,6 +176,30 @@ def directory(subdir):
         video_thumbnails=video_thumbnails,
         path_sep=os.path.sep
     )
+
+@app.route('/api/favorites', methods=['GET'])
+def get_favorites():
+    with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
+        return jsonify(json.load(f))
+
+@app.route('/api/favorite', methods=['POST'])
+def set_favorite():
+    data = request.get_json()
+    filename = data['filename']
+    status = data['favorite']
+
+    with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
+        favorites = json.load(f)
+
+    if status:
+        favorites[filename] = True
+    else:
+        favorites.pop(filename, None)
+
+    with open(FAVORITES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(favorites, f, indent=2, ensure_ascii=False)
+
+    return jsonify(success=True)
 
 if __name__ == '__main__':
     Timer(1, lambda: webbrowser.open_new('http://127.0.0.1:5000')).start()
