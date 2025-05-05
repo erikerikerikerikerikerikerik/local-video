@@ -1,6 +1,6 @@
 # local-video
 
-The `local-video` app is a simple Flask-based web application designed to manage and display video files on your local machine. It allows users to view video files, generate thumbnails, and stream videos directly from a local server.
+The `local-video` app is a simple Flask-based web application designed to manage and display video files on your local machine. It allows users to view video files, generate thumbnails, organize favorites and stream videos directly from a local server.
 
 ###### Designed and coded by erikerikerikerikerikerikerik
 
@@ -13,6 +13,8 @@ The `local-video` app is a simple Flask-based web application designed to manage
 - Plays video files with a built-in video player.
 - Supports common video formats (`.mp4`, `.avi`, `.mov`, `.mkv`).
 - Customizable thumbnail and template directories.
+- Ability to mark videos as favorite.
+- Quick overview of favorited videos.
 
 ## Requirements
 
