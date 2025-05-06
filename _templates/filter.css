@@ -91,6 +91,7 @@ body {
     object-fit: cover;
     object-position: center;
     cursor: pointer;
+    z-index: 5;
 }
 
 .gallery-item img:hover {

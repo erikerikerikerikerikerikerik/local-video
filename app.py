@@ -36,6 +36,11 @@ def generate_video_thumbnail(video_path):
     stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 40]
     generated_thumbnails = []
 
+    first_thumb = os.path.join(thumbnail_dir, "thumb_00.jpg")
+    if os.path.exists(first_thumb):
+        print(f"First thumbnail found for {relative_video_path}. Skipping generation.")
+        return [os.path.join(base_name, f"thumb_{i:02d}.jpg") for i in range(len(stillframes))]
+
     video_duration = get_video_duration(video_path)
 
     for idx, time in enumerate(stillframes):
