@@ -52,6 +52,7 @@ def generate_video_thumbnail(video_path):
                         "scale='if(gt(iw,ih),300,-1)':'if(lt(iw,ih),300,-1)'"
                     ), strict='unofficial'
                 ).run(capture_stdout=True, capture_stderr=True)
+                print(f"Generated thumbnail: {thumbnail_path}")
             except ffmpeg.Error as e:
                 print(f"Error generating thumbnail: {e}")
                 continue
@@ -179,11 +180,13 @@ def directory(subdir):
 
 @app.route('/api/favorites', methods=['GET'])
 def get_favorites():
+    """get favorite"""
     with open(FAVORITES_FILE, 'r', encoding='utf-8') as f:
         return jsonify(json.load(f))
 
 @app.route('/api/favorite', methods=['POST'])
 def set_favorite():
+    """set favorite"""
     data = request.get_json()
     filename = data['filename']
     status = data['favorite']
