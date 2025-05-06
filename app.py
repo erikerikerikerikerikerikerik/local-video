@@ -149,7 +149,7 @@ def serve_thumbnail(filename):
 @app.route('/directory/', defaults={'subdir': ''})
 @app.route('/directory/<path:subdir>')
 def directory(subdir):
-    """Serve the directory structure and videos"""
+    """serve directory"""
     if subdir:
         dir_path = os.path.join(PROJECT_ROOT, subdir)
     else:
