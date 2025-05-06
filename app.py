@@ -17,7 +17,7 @@ PROJECT_ROOT = os.path.abspath('.')
 EXCLUDED_DIRS = ['_templates', '_thumbnails']
 THUMBNAILS_DIR = os.path.join(PROJECT_ROOT, '_thumbnails')
 FAVORITES_FILE = os.path.join(PROJECT_ROOT, 'favorites.json')
-SUPPORTED_EXTENSIONS = ('.mp4', '.avi', '.mov', '.mkv')
+SUPPORTED_EXTENSIONS = ('.mp4')
 
 if not os.path.exists(THUMBNAILS_DIR):
     os.makedirs(THUMBNAILS_DIR)
@@ -27,9 +27,9 @@ if not os.path.exists(FAVORITES_FILE):
         json.dump({}, f)
 
 def generate_video_thumbnail(video_path):
-    """generate multiple thumbnails per video into a subfolder"""
+    """generate thumbnails"""
     relative_video_path = os.path.relpath(video_path, PROJECT_ROOT)
-    base_name = os.path.splitext(relative_video_path)[0]  # removes .mp4 etc
+    base_name = os.path.splitext(relative_video_path)[0]
     thumbnail_dir = os.path.join(THUMBNAILS_DIR, base_name)
     os.makedirs(thumbnail_dir, exist_ok=True)
 
@@ -67,7 +67,7 @@ def generate_video_thumbnail(video_path):
     return generated_thumbnails
 
 def get_video_duration(video_path):
-    """duration of vid in seconds"""
+    """video duration"""
     try:
         probe = ffmpeg.probe(video_path, v='error', select_streams='v:0', show_entries='format=duration')
         duration = float(probe['format']['duration'])
