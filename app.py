@@ -33,7 +33,7 @@ def generate_video_thumbnail(video_path):
     thumbnail_dir = os.path.join(THUMBNAILS_DIR, base_name)
     os.makedirs(thumbnail_dir, exist_ok=True)
 
-    stillframes = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 40]
+    stillframes = [20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
     generated_thumbnails = []
 
     first_thumb = os.path.join(thumbnail_dir, "thumb_00.jpg")
@@ -108,7 +108,7 @@ def index():
         thumbnails = generate_video_thumbnail(video_path)
         video_thumbnails[video] = thumbnails
 
-    return render_template('index.html', videos=videos, video_thumbnails=video_thumbnails)
+    return render_template('index.html', videos=videos, video_thumbnails=video_thumbnails, video_count=len(videos))
 
 @app.route('/play/<path:filename>')
 def play_video(filename):
