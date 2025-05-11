@@ -176,14 +176,11 @@ def directory(subdir):
             if thumbnails:
                 video_thumbnails[video] = thumbnails
 
-    total_videos = sum(len(files) for files in directory_tree.values())
-
     return render_template(
         'filter.html', 
         directory_tree=directory_tree,
         video_thumbnails=video_thumbnails,
-        video_count=total_videos,
-        path_sep=os.path.sep
+        path_sep=os.path.sep,
     )
 
 @app.route('/api/favorites', methods=['GET'])
