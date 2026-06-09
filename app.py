@@ -92,7 +92,13 @@ def generate_poster_thumbnail(video_path):
     if os.path.exists(poster_path):
         return poster_relative_path
     try:
-        ffmpeg.input(video_path, ss=20).output(
+        video_duration = get_video_duration(video_path)
+        poster_time = 0
+
+        if video_duration > 2:
+            poster_time = min(20, max(1, video_duration * 0.1))
+
+        ffmpeg.input(video_path, ss=poster_time).output(
             poster_path, vframes=1, vf=(
                 "scale='if(gt(iw,ih),300,-1)':'if(lt(iw,ih),300,-1)'"
             ), strict='unofficial'

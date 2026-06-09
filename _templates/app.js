@@ -1,5 +1,5 @@
 let favoriteViewActive = false;
-let activeTagFilter = null;
+let activeTagFilters = new Set();
 
 async function loadFavorites() {
     const res = await fetch('/api/favorites');
@@ -38,7 +38,7 @@ async function toggleFavoriteView() {
         const videoPath = item.dataset.video;
         const itemTags = getItemTags(item);
         const shouldDimFavorite = favoriteViewActive && !favorites[videoPath];
-        const shouldDimTag = activeTagFilter && !itemTags.includes(activeTagFilter);
+        const shouldDimTag = !matchesActiveTagFilters(itemTags);
 
         if (shouldDimFavorite || shouldDimTag) {
             item.classList.add('dimmed');
@@ -55,11 +55,16 @@ function getItemTags(item) {
         .filter(Boolean);
 }
 
+function matchesActiveTagFilters(itemTags) {
+    if (!activeTagFilters.size) return true;
+    return Array.from(activeTagFilters).every(tag => itemTags.includes(tag));
+}
+
 function applyTagFilter() {
     document.querySelectorAll('.gallery-item').forEach(item => {
         const itemTags = getItemTags(item);
 
-        if (activeTagFilter && !itemTags.includes(activeTagFilter)) {
+        if (!matchesActiveTagFilters(itemTags)) {
             item.classList.add('dimmed');
         } else if (!favoriteViewActive) {
             item.classList.remove('dimmed');
@@ -67,7 +72,7 @@ function applyTagFilter() {
     });
 
     document.querySelectorAll('.tag-filter-button').forEach(button => {
-        button.classList.toggle('active', button.dataset.tag === activeTagFilter);
+        button.classList.toggle('active', activeTagFilters.has(button.dataset.tag));
     });
 }
 
@@ -104,7 +109,14 @@ async function setVideoTag(video, tag, enabled = true) {
 function setupTagFilters() {
     document.querySelectorAll('.tag-filter-button').forEach(button => {
         button.addEventListener('click', () => {
-            activeTagFilter = activeTagFilter === button.dataset.tag ? null : button.dataset.tag;
+            const tag = button.dataset.tag;
+
+            if (activeTagFilters.has(tag)) {
+                activeTagFilters.delete(tag);
+            } else {
+                activeTagFilters.add(tag);
+            }
+
             applyTagFilter();
         });
     });
@@ -145,7 +157,12 @@ function setupNewTagBox() {
             filterButton.type = 'button';
             filterButton.textContent = `#${tag}`;
             filterButton.addEventListener('click', () => {
-                activeTagFilter = activeTagFilter === tag ? null : tag;
+                if (activeTagFilters.has(tag)) {
+                    activeTagFilters.delete(tag);
+                } else {
+                    activeTagFilters.add(tag);
+                }
+
                 applyTagFilter();
             });
             filterContainer.appendChild(filterButton);
