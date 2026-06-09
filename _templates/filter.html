@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>local-video</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='filter.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
     <div class="directory-tree">
@@ -22,13 +23,14 @@
                 </h2>
                 <div class="gallery gallery-5">
                     {% for video in videos %}
-                        <div class="gallery-item">
+                        <div class="gallery-item" data-video="{{ video }}">
                             <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
-                                <div class="favorite-star" onclick="toggleFavorite(event, '{{ video }}')">★</div>
-                                <img class="thumbnail" 
-                                    src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}" 
-                                    alt="Video Thumbnail" 
-                                    data-thumbnails="{{ video_thumbnails[video] | join(',') }}">
+                                <div class="favorite-star">★</div>
+                                <img class="thumbnail"
+                                    src="{{ url_for('serve_thumbnail', filename=video_thumbnails[video][0]) }}"
+                                    alt="Video Thumbnail"
+                                    data-video="{{ video }}"
+                                    data-poster="{{ video_thumbnails[video][0] }}">
                                 <div class="overlay">
                                     <div class="file-name">{{ video.split('/')[-1] }}</div>
                                 </div>
@@ -50,85 +52,5 @@
     <div class="floating-buttons left">
         <button onclick="toggleFavoriteView()">★</button>
     </div>
-
-    <script>
-        let favoriteViewActive = false;
-
-        async function loadFavorites() {
-            const res = await fetch('/api/favorites');
-            const favorites = await res.json();
-
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                const star = item.querySelector('.favorite-star');
-                const videoPath = star?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-                if (favorites[videoPath]) {
-                    star.classList.add('favorited');
-                }
-            });
-        }
-
-        async function toggleFavorite(event, video) {
-            event.preventDefault();
-            event.stopPropagation();
-            const star = event.target;
-            const isFavorited = star.classList.toggle('favorited');
-
-            await fetch('/api/favorite', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: video, favorite: !!isFavorited })
-            });
-        }
-
-        async function toggleFavoriteView() {
-            favoriteViewActive = !favoriteViewActive;
-            const res = await fetch('/api/favorites');
-            const favorites = await res.json();
-
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                const star = item.querySelector('.favorite-star');
-                const videoPath = star?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-
-                if (favoriteViewActive) {
-                    if (!favorites[videoPath]) {
-                        item.classList.add('dimmed');
-                    }
-                } else {
-                    item.classList.remove('dimmed');
-                }
-            });
-        }
-
-        function setGridColumns(columns) {
-            const galleries = document.querySelectorAll('.gallery');
-            galleries.forEach(gallery => {
-                gallery.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-                gallery.classList.remove('gallery-3', 'gallery-5', 'gallery-10', 'gallery-20');
-                gallery.classList.add(`gallery-${columns}`);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFavorites();
-
-            document.querySelectorAll('.thumbnail').forEach(thumbnail => {
-                const thumbnailsList = thumbnail.dataset.thumbnails.split(',');
-                let currentIndex = 0;
-                let interval;
-
-                thumbnail.addEventListener('mouseover', () => {
-                    interval = setInterval(() => {
-                        currentIndex = (currentIndex + 1) % thumbnailsList.length;
-                        thumbnail.src = `/_thumbnails/${thumbnailsList[currentIndex].trim()}`;
-                    }, 500);
-                });
-
-                thumbnail.addEventListener('mouseout', () => {
-                    clearInterval(interval);
-                    thumbnail.src = `/_thumbnails/${thumbnailsList[0].trim()}`;
-                });
-            });
-        });
-    </script>
 </body>
 </html>
