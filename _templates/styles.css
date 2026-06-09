@@ -163,7 +163,157 @@ a:hover {
     filter: grayscale(100%) brightness(0.6);
 }
 
+.gallery-item.dimmed:hover {
+    filter: grayscale(100%) brightness(0.75);
+}
+
 .floating-buttons.left {
     left: 20px;
-    right: auto;
+    right: 90px;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+}
+
+.favorite-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.favorite-control #video-count {
+    font-weight: bold;
+    line-height: 1;
+}
+
+.tag-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.gallery-item.tag-hidden {
+    filter: grayscale(100%) brightness(0.6);
+}
+
+.tag-menu {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 12;
+}
+
+.tag-menu-button {
+    background-color: rgba(0, 0, 0, 0.65);
+    color: #ccc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 6px;
+}
+
+.tag-menu-panel {
+    display: none;
+    position: absolute;
+    top: 26px;
+    right: 0;
+    width: 180px;
+    max-width: calc(100vw - 40px);
+    padding: 6px;
+    background-color: rgba(20, 20, 20, 0.95);
+    border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.tag-menu.open .tag-menu-panel {
+    display: block;
+}
+
+.new-tag-box {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    width: 120px;
+    flex: 0 0 120px;
+    flex-wrap: nowrap;
+}
+
+.new-tag-box input {
+    min-width: 0;
+    flex: 1 1 auto;
+    background-color: #333;
+    color: #ddd;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 3px;
+}
+
+.new-tag-box button {
+    flex: 0 0 auto;
+    width: auto;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 3px 6px;
+}
+
+.video-tag-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.video-tag-option {
+    width: auto !important;
+    max-width: 100%;
+    background-color: #333;
+    color: #aaa;
+    border: 1px solid #555;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 2px 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.video-tag-option.selected {
+    background-color: #888;
+    color: #fff;
+    border-color: #aaa;
+}
+
+.tag-filter-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.tag-filter-button {
+    width: auto !important;
+    max-width: none !important;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.tag-filter-button.active {
+    background-color: #888;
 }

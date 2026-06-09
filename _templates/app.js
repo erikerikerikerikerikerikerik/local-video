@@ -1,4 +1,5 @@
 let favoriteViewActive = false;
+let activeTagFilter = null;
 
 async function loadFavorites() {
     const res = await fetch('/api/favorites');
@@ -35,12 +36,157 @@ async function toggleFavoriteView() {
 
     document.querySelectorAll('.gallery-item').forEach(item => {
         const videoPath = item.dataset.video;
+        const itemTags = getItemTags(item);
+        const shouldDimFavorite = favoriteViewActive && !favorites[videoPath];
+        const shouldDimTag = activeTagFilter && !itemTags.includes(activeTagFilter);
 
-        if (favoriteViewActive && !favorites[videoPath]) {
+        if (shouldDimFavorite || shouldDimTag) {
             item.classList.add('dimmed');
         } else {
             item.classList.remove('dimmed');
         }
+    });
+}
+
+function getItemTags(item) {
+    return (item.dataset.tags || '')
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean);
+}
+
+function applyTagFilter() {
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        const itemTags = getItemTags(item);
+
+        if (activeTagFilter && !itemTags.includes(activeTagFilter)) {
+            item.classList.add('dimmed');
+        } else if (!favoriteViewActive) {
+            item.classList.remove('dimmed');
+        }
+    });
+
+    document.querySelectorAll('.tag-filter-button').forEach(button => {
+        button.classList.toggle('active', button.dataset.tag === activeTagFilter);
+    });
+}
+
+async function refreshTags() {
+    const res = await fetch('/api/tags');
+    const data = await res.json();
+
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        const videoPath = item.dataset.video;
+        const itemTags = data.videos[videoPath] || [];
+        item.dataset.tags = itemTags.join(',');
+
+        item.querySelectorAll('.video-tag-option').forEach(button => {
+            button.classList.toggle('selected', itemTags.includes(button.dataset.tag));
+        });
+    });
+
+    applyTagFilter();
+}
+
+async function setVideoTag(video, tag, enabled = true) {
+    tag = (tag || '').trim();
+    if (!video || !tag) return;
+
+    await fetch('/api/video-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: video, tag, enabled })
+    });
+
+    await refreshTags();
+}
+
+function setupTagFilters() {
+    document.querySelectorAll('.tag-filter-button').forEach(button => {
+        button.addEventListener('click', () => {
+            activeTagFilter = activeTagFilter === button.dataset.tag ? null : button.dataset.tag;
+            applyTagFilter();
+        });
+    });
+}
+
+function setupNewTagBox() {
+    const input = document.querySelector('#new-tag-input');
+    const button = document.querySelector('#new-tag-button');
+
+    if (!input || !button) return;
+
+    const addNewTagToMenus = () => {
+        const tag = (input.value || '').trim().toLowerCase();
+        if (!tag) return;
+
+        document.querySelectorAll('.video-tag-options').forEach(options => {
+            const exists = Array.from(options.querySelectorAll('.video-tag-option'))
+                .some(button => button.dataset.tag === tag);
+
+            if (!exists) {
+                const button = document.createElement('button');
+                button.className = 'video-tag-option';
+                button.dataset.tag = tag;
+                button.type = 'button';
+                button.textContent = `#${tag}`;
+                options.appendChild(button);
+            }
+        });
+
+        const filterExists = Array.from(document.querySelectorAll('.tag-filter-button'))
+            .some(button => button.dataset.tag === tag);
+        const filterContainer = document.querySelector('.tag-filter-buttons');
+
+        if (filterContainer && !filterExists) {
+            const filterButton = document.createElement('button');
+            filterButton.className = 'tag-filter-button';
+            filterButton.dataset.tag = tag;
+            filterButton.type = 'button';
+            filterButton.textContent = `#${tag}`;
+            filterButton.addEventListener('click', () => {
+                activeTagFilter = activeTagFilter === tag ? null : tag;
+                applyTagFilter();
+            });
+            filterContainer.appendChild(filterButton);
+        }
+
+        input.value = '';
+    };
+
+    button.addEventListener('click', addNewTagToMenus);
+
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addNewTagToMenus();
+        }
+    });
+}
+
+function setupTagMenus() {
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        const menu = item.querySelector('.tag-menu');
+        if (!menu) return;
+
+        const menuButton = menu.querySelector('.tag-menu-button');
+
+        menuButton.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            menu.classList.toggle('open');
+        });
+
+        menu.addEventListener('click', event => {
+            const tagButton = event.target.closest('.video-tag-option');
+            if (!tagButton) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const enabled = !tagButton.classList.contains('selected');
+            setVideoTag(item.dataset.video, tagButton.dataset.tag, enabled);
+        });
     });
 }
 
@@ -112,6 +258,10 @@ function setupFavoriteButtons() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFavorites();
+    refreshTags();
     setupFavoriteButtons();
     setupPreviewHover();
+    setupTagFilters();
+    setupNewTagBox();
+    setupTagMenus();
 });

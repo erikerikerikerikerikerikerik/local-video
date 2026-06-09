@@ -12,7 +12,7 @@
         {% for video in videos %}
             {% if video_thumbnails[video] %}
                 {% set directory_name, file_name = video.rsplit('/', 1) %}
-                <div class="gallery-item" data-video="{{ video }}">
+                <div class="gallery-item" data-video="{{ video }}" data-tags="{{ tags.get(video, [])|join(',') }}">
                     <a href="{{ url_for('play_video', filename=video) }}" target="_blank">
                         <div class="favorite-star">★</div>
                         <img class="thumbnail"
@@ -23,6 +23,18 @@
                         <div class="overlay">
                             <div class="directory-name">{{ directory_name }}</div>
                             <div class="file-name">{{ file_name }}</div>
+                        </div>
+                        <div class="tag-menu" data-video="{{ video }}">
+                            <button class="tag-menu-button" type="button">#</button>
+                            <div class="tag-menu-panel">
+                                <div class="video-tag-options">
+                                    {% for tag in all_tags %}
+                                        <button class="video-tag-option {% if tag in tags.get(video, []) %}selected{% endif %}"
+                                                data-tag="{{ tag }}"
+                                                type="button">#{{ tag }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -40,8 +52,21 @@
         </a>
     </div>
     <div class="floating-buttons left">
-        <button onclick="toggleFavoriteView()">★</button>
-        <div id="video-count" style="font-weight: bold; margin-top: 4px;">{{ video_count }}</div>
+        <div class="favorite-control">
+            <div id="video-count">{{ video_count }}</div>
+            <button onclick="toggleFavoriteView()">★</button>
+        </div>
+        <div class="tag-controls">
+            <div class="new-tag-box">
+                <input id="new-tag-input" type="text" placeholder="nieuwe tag">
+                <button id="new-tag-button" type="button">+</button>
+            </div>
+            <div class="tag-filter-buttons">
+                {% for tag in all_tags %}
+                    <button class="tag-filter-button" data-tag="{{ tag }}" type="button">#{{ tag }}</button>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </body>
 </html>
